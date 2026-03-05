@@ -224,6 +224,12 @@
   }
 
   function quickAdd(p) {
+    const hasSizes = (p.size || "").split(",").map(s => s.trim()).filter(Boolean).length > 0;
+    if (hasSizes) {
+      // Redirect to product page so customer can pick their size
+      window.location = "product.html?id=" + p.id;
+      return;
+    }
     addToCart(p, 1);
     showToast(`✅ ${p.name} added to cart!`);
   }
