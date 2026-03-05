@@ -5,6 +5,10 @@ const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRjlowL7b
 
 const ORDERS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRjlowL7bPj9fTBIEFlA26bd1TVEIbfXrU5Wf77sp6KainrijSlzTkYCZvxyCm2sTRnzyTtQe_TOYez/pub?gid=521859531&single=true&output=csv";
 
+// ← PASTE YOUR APPS SCRIPT URL HERE — this makes orders sync across ALL devices
+// Get it from admin.html → ⚙ Apps Script Setup → deploy as web app
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyR02SzkiNPhiVjaKvAubwSfrWwH9fQdHWCVNDm9iwFXVSrNlh3gNnftea6W24hsTHN/exec";
+
 // CORS proxy — makes Google Sheets work on Live Server AND GitHub Pages
 const SHEET_URL = `https://corsproxy.io/?${encodeURIComponent(SHEET_CSV_URL)}&_=${Date.now()}`;
 
@@ -215,14 +219,16 @@ document.addEventListener("DOMContentLoaded", () => {
 // Save order to Google Sheet via Apps Script
 // ============================================================
 async function saveOrderToSheet(order) {
-  const scriptUrl = localStorage.getItem("as_apps_script_url");
+  // Use hardcoded URL first, fall back to localStorage (set via admin panel)
+  const scriptUrl = (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE")
+    ? APPS_SCRIPT_URL
+    : localStorage.getItem("as_apps_script_url");
+
   if (!scriptUrl) {
     console.warn("⚠️ Apps Script not connected — order saved locally only");
     return;
   }
 
-  // Build a readable items string with ALL details you need to pack the order
-  // Format: "Product Name | ID:1 | Size:40 | Qty:2 | $24.99each"
   var itemsText = order.items.map(function(i) {
     var parts = i.name;
     if (i.id)   parts += " | ID:" + i.id;
@@ -233,7 +239,7 @@ async function saveOrderToSheet(order) {
   }).join("  //  ");
 
   try {
-    var res = await fetch(scriptUrl, {
+    await fetch(scriptUrl, {
       method: "POST",
       body: JSON.stringify({
         action: "save_order",
