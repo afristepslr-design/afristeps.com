@@ -7,7 +7,7 @@ const ORDERS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRjlowL7
 
 // ← PASTE YOUR APPS SCRIPT URL HERE — this makes orders sync across ALL devices
 // Get it from admin.html → ⚙ Apps Script Setup → deploy as web app
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyR02SzkiNPhiVjaKvAubwSfrWwH9fQdHWCVNDm9iwFXVSrNlh3gNnftea6W24hsTHN/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnPq0V96bNnFQO_mHhXgUGGRZQSxHt9L5aCnWr3zw0O_du-_sv9Mh_p9rRP8pDaoTb/exec";
 
 // CORS proxy — makes Google Sheets work on Live Server AND GitHub Pages
 const SHEET_URL = `https://corsproxy.io/?${encodeURIComponent(SHEET_CSV_URL)}&_=${Date.now()}`;
@@ -24,7 +24,8 @@ function saveCart(cart) {
 }
 function addToCart(product, qty = 1) {
   const cart = getCart();
-  const idx = cart.findIndex(i => i.id === product.id);
+  // Match by BOTH product id AND selected size — so same product in different sizes = separate cart lines
+  const idx = cart.findIndex(i => i.id === product.id && (i.selectedSize || "") === (product.selectedSize || ""));
   if (idx > -1) cart[idx].qty += qty;
   else cart.push({ ...product, qty });
   saveCart(cart);
