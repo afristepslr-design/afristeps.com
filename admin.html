@@ -1148,6 +1148,14 @@ function doGet(e) {
 // ── CONFIG ──
 const LOCAL_KEY = "as_admin_products";
 const SCRIPT_URL_KEY = "as_apps_script_url";
+
+// Always prefer the hardcoded URL from shared.js, fall back to localStorage
+function getScriptUrl() {
+  if (typeof APPS_SCRIPT_URL !== "undefined" && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE") {
+    return APPS_SCRIPT_URL;
+  }
+  return getScriptUrl();
+}
 const ADMIN_PASSWORD = "afristeps2025"; // ← Change this before deploying!
 
 // ── AUTH ──
@@ -1176,7 +1184,7 @@ function initDashboard() {
   loadProducts();
   updateOrdersBadge();
   testSheetConnection();
-  var url = localStorage.getItem(SCRIPT_URL_KEY);
+  var url = getScriptUrl();
   if (url) document.getElementById("apps-script-url").value = url;
 }
 
@@ -1361,7 +1369,7 @@ function saveProduct() {
 }
 
 async function pushToSheet(product, action) {
-  const url = localStorage.getItem(SCRIPT_URL_KEY);
+  const url = getScriptUrl();
   if (!url) return;
   try {
     await fetch(url, { method: "POST", body: JSON.stringify({ action, ...product }), headers: { "Content-Type": "text/plain" } });
@@ -1598,7 +1606,7 @@ function updateOrderStatus(orderId, newStatus) {
   if (idx > -1) { orders[idx].status = newStatus; localStorage.setItem("as_orders", JSON.stringify(orders)); }
   if (window._allOrders) { const ai = window._allOrders.findIndex(o => o.id === orderId); if (ai > -1) window._allOrders[ai].status = newStatus; }
 
-  const scriptUrl = localStorage.getItem(SCRIPT_URL_KEY);
+  const scriptUrl = getScriptUrl();
   if (scriptUrl) {
     fetch(scriptUrl, { method:"POST", body: JSON.stringify({action:"update_order_status",id:orderId,status:newStatus}), headers:{"Content-Type":"text/plain"} })
       .catch(e => console.warn("Status update failed:", e));
@@ -1641,7 +1649,7 @@ function deleteOrder(orderId) {
   localStorage.setItem("as_orders", JSON.stringify(orders));
   if (window._allOrders) window._allOrders = window._allOrders.filter(o => o.id !== orderId);
   // Push deletion to Google Sheet
-  const scriptUrl = localStorage.getItem(SCRIPT_URL_KEY);
+  const scriptUrl = getScriptUrl();
   if (scriptUrl) {
     fetch(scriptUrl, {
       method: "POST",
