@@ -243,8 +243,25 @@
   }
 
   function handleATC(product) {
+    // If product has sizes, require one to be selected
+    const hasSizes = (product.size || "").split(",").map(s => s.trim()).filter(Boolean).length > 0;
+    if (hasSizes && !selectedSize) {
+      showToast("⚠️ Please select a size first!");
+      // Highlight the size grid
+      const grid = document.getElementById("size-grid");
+      if (grid) {
+        grid.style.outline = "2px solid var(--accent)";
+        grid.style.borderRadius = "8px";
+        setTimeout(() => { grid.style.outline = "none"; }, 2000);
+      }
+      return;
+    }
     addToCart({ ...product, selectedSize }, qty);
-    showToast(`✅ ${product.name} added to cart!`);
+    showToast(`✅ ${product.name}${selectedSize ? " (Size " + selectedSize + ")" : ""} × ${qty} added to cart!`);
+
+    // Reset qty to 1 but keep size selected so customer can easily add another size
+    qty = 1;
+    document.getElementById("qty-val").textContent = "1";
   }
 
   function showToast(msg) {
