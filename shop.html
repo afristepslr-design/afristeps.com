@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop — AfriSteps</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .shop-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 80px;
+    }
+    .sidebar h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--dark);
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 0.4rem;
+    }
+    .filter-group { margin-bottom: 1.5rem; }
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem 0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .filter-option input { accent-color: var(--earth); }
+    .price-range {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .price-range input {
+      width: 70px;
+      padding: 0.4rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Toolbar */
+    .shop-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .result-count { color: var(--muted); font-size: 0.9rem; }
+    .sort-select {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      background: white;
+      cursor: pointer;
+    }
+    .search-input {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      width: 220px;
+    }
+    .search-input:focus { outline: 2px solid var(--gold); border-color: transparent; }
+
+    @media (max-width: 768px) {
+      .shop-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .filter-group { margin-bottom: 1rem; }
+      .shop-toolbar { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+      .shop-toolbar > div { flex-direction: column; gap: 0.5rem; }
+      .search-input { width: 100%; }
+      .sort-select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header id="site-header"></header>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> › Shop
+  </div>
+  <h1 class="section-title">All Products</h1>
+  <p class="section-sub">Authentic African slippers, handcrafted with love</p>
+
+  <div class="shop-layout">
+    <!-- SIDEBAR FILTERS -->
+    <aside class="sidebar">
+      <div class="filter-group">
+        <h3>Categories</h3>
+        <label class="filter-option"><input type="checkbox" value="Slides" onchange="applyFilters()"> Slides</label>
+        <label class="filter-option"><input type="checkbox" value="Sandals" onchange="applyFilters()"> Sandals</label>
+        <label class="filter-option"><input type="checkbox" value="Flip Flops" onchange="applyFilters()"> Flip Flops</label>
+        <label class="filter-option"><input type="checkbox" value="Mules" onchange="applyFilters()"> Mules</label>
+        <label class="filter-option"><input type="checkbox" value="Loafers" onchange="applyFilters()"> Loafers</label>
+        <label class="filter-option"><input type="checkbox" value="Espadrilles" onchange="applyFilters()"> Espadrilles</label>
+      </div>
+      <div class="filter-group">
+        <h3>Price Range ($)</h3>
+        <div class="price-range">
+          <input type="number" id="min-price" placeholder="Min" min="0" oninput="applyFilters()" />
+          <span>–</span>
+          <input type="number" id="max-price" placeholder="Max" min="0" oninput="applyFilters()" />
+        </div>
+      </div>
+      <button class="btn btn-outline" style="width:100%;margin-top:0.5rem;" onclick="clearFilters()">Clear Filters</button>
+    </aside>
+
+    <!-- PRODUCT GRID -->
+    <div>
+      <div class="shop-toolbar">
+        <div class="result-count" id="result-count">Loading…</div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <input type="text" class="search-input" id="search-input" placeholder="🔍 Search products…" oninput="applyFilters()" />
+          <select class="sort-select" id="sort-select" onchange="applyFilters()">
+            <option value="default">Sort: Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A–Z</option>
+          </select>
+        </div>
+      </div>
+      <div class="products-grid" id="products-grid">
+        <div class="loading" style="grid-column:1/-1;">Loading products from Google Sheets…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <p>© 2025 <span>AfriSteps</span> — Proudly made in Africa 🌍</p>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+  document.getElementById("site-header").innerHTML = renderNav("shop");
+
+  let allProducts = [];
+
+  fetchProducts().then(products => {
+    allProducts = products;
+
+    // Check URL param for category filter
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get("cat");
+    if (cat) {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(cb => { if (cb.value === cat) cb.checked = true; });
+    }
+
+    applyFilters();
+  });
+
+  function applyFilters() {
+    const search = document.getElementById("search-input").value.toLowerCase();
+    const sort = document.getElementById("sort-select").value;
+    const minPrice = parseFloat(document.getElementById("min-price").value) || 0;
+    const maxPrice = parseFloat(document.getElementById("max-price").value) || Infinity;
+    const checkedCats = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(c => c.value);
+
+    let filtered = allProducts.filter(p => {
+      const price = parseFloat(p.price);
+      const matchSearch = p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search);
+      const matchCat = checkedCats.length === 0 || checkedCats.includes(p.category);
+      const matchPrice = price >= minPrice && price <= maxPrice;
+      return matchSearch && matchCat && matchPrice;
+    });
+
+    // Sort
+    if (sort === "price-asc") filtered.sort((a,b) => parseFloat(a.price) - parseFloat(b.price));
+    else if (sort === "price-desc") filtered.sort((a,b) => parseFloat(b.price) - parseFloat(a.price));
+    else if (sort === "name-asc") filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+    renderProducts(filtered);
+  }
+
+  function renderProducts(products) {
+    const grid = document.getElementById("products-grid");
+    const count = document.getElementById("result-count");
+    count.textContent = `${products.length} product${products.length !== 1 ? "s" : ""} found`;
+
+    if (!products.length) {
+      grid.innerHTML = `<div class="loading" style="grid-column:1/-1;">No products found. Try adjusting your filters.</div>`;
+      return;
+    }
+
+    grid.innerHTML = products.map(p => `
+      <div class="product-card" onclick="window.location='product.html?id=${p.id}'">
+        <img src="${p.image}" alt="${p.name}" loading="lazy" />
+        <div class="product-card-body">
+          <div class="product-card-category">${p.category}</div>
+          <div class="product-card-name">${p.name}</div>
+          <div class="product-card-price">$${parseFloat(p.price).toFixed(2)}</div>
+        </div>
+        <div class="product-card-footer">
+          <button class="btn btn-primary" style="flex:1;font-size:0.82rem;" onclick="event.stopPropagation();quickAdd(${JSON.stringify(p).replace(/"/g,'&quot;')})">🛒 Add</button>
+          <a href="product.html?id=${p.id}" class="btn btn-dark" style="font-size:0.82rem;">View</a>
+        </div>
+      </div>`).join("");
+  }
+
+  function quickAdd(p) {
+    addToCart(p, 1);
+    showToast(`✅ ${p.name} added to cart!`);
+  }
+
+  function clearFilters() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.getElementById("min-price").value = "";
+    document.getElementById("max-price").value = "";
+    document.getElementById("search-input").value = "";
+    document.getElementById("sort-select").value = "default";
+    applyFilters();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2800);
+  }
+</script>
+</body>
+</html>

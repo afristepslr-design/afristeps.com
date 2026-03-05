@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — AfriSteps</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .about-hero {
+      background: var(--dark);
+      color: white;
+      text-align: center;
+      padding: 5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=1200") center/cover;
+      opacity: 0.15;
+    }
+    .about-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      position: relative;
+    }
+    .about-hero h1 em { color: var(--gold); font-style: italic; }
+    .about-hero p { color: #bbb; font-size: 1.1rem; margin-top: 1rem; position: relative; max-width: 580px; margin-inline: auto; }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      margin-bottom: 4rem;
+    }
+    .story-grid img {
+      width: 100%;
+      border-radius: 16px;
+      height: 360px;
+      object-fit: cover;
+      box-shadow: var(--shadow);
+    }
+    .story-grid h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+    }
+    .story-grid p {
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+    .value-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .value-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .value-card h3 {
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 0.5rem;
+    }
+    .value-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+    @media (max-width: 768px) {
+      .story-grid { grid-template-columns: 1fr; }
+      .values-grid { grid-template-columns: 1fr; }
+      .about-hero h1 { font-size: 2rem; }
+      .story-grid img { height: 240px; }
+    }
+  </style>
+</head>
+<body>
+<header id="site-header"></header>
+
+<div class="about-hero">
+  <h1>Our <em>African</em> Story</h1>
+  <p>Born in Liberia. Built on tradition. Sharing African craftsmanship with the world.</p>
+</div>
+
+<div class="page-wrap">
+  <div class="story-grid" style="margin-top:3rem;">
+    <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600" alt="Handmade slippers" />
+    <div>
+      <h2>From Monrovia to the World</h2>
+      <p>AfriSteps was founded by a school principal in Liberia who wanted to share the beauty of African artisan craftsmanship with the world — while creating income opportunities for local artisans.</p>
+      <p>Every pair of slippers in our collection is made by skilled craftspeople across West Africa, using traditional techniques passed down through generations combined with bold, modern African prints.</p>
+      <p>When you buy from AfriSteps, you're not just getting a beautiful pair of shoes — you're supporting African families and keeping ancient traditions alive.</p>
+      <a href="shop.html" class="btn btn-primary" style="margin-top:1rem;">Shop the Collection →</a>
+    </div>
+  </div>
+
+  <h2 class="section-title" style="text-align:center;">Our Values</h2>
+  <p class="section-sub" style="text-align:center;">What drives everything we do</p>
+  <div class="values-grid">
+    <div class="value-card">
+      <div class="value-icon">🌿</div>
+      <h3>Sustainable Materials</h3>
+      <p>We source natural leathers, organic fabrics and recycled materials to minimize our environmental impact.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">🤝</div>
+      <h3>Fair Trade</h3>
+      <p>Every artisan is paid fairly and works in safe conditions. We believe in business that uplifts communities.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">🎨</div>
+      <h3>Authentic Culture</h3>
+      <p>Each design tells a story — from Kente weaves to Ankara prints, celebrating Africa's rich artistic heritage.</p>
+    </div>
+  </div>
+
+  <div style="background:var(--dark);border-radius:16px;padding:3rem;text-align:center;color:white;">
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:0.75rem;">Ready to Walk in Style?</h2>
+    <p style="color:#aaa;margin-bottom:1.5rem;">Join thousands of happy customers who love their AfriSteps slippers.</p>
+    <a href="shop.html" class="btn btn-primary" style="font-size:1rem;padding:0.9rem 2rem;">Browse the Collection →</a>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 <span>AfriSteps</span> — Proudly made in Africa 🌍 | Based in Monrovia, Liberia</p>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+  document.getElementById("site-header").innerHTML = renderNav("about");
+</script>
+</body>
+</html>

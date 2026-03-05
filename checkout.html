@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — AfriSteps</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 2rem;
+      align-items: start;
+    }
+    .checkout-form-panel {
+      background: white;
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+    .form-section {
+      margin-bottom: 2rem;
+    }
+    .form-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--gold);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.35rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      background: var(--cream);
+      transition: border-color 0.2s, outline 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--gold);
+      outline: 2px solid rgba(201,168,76,0.25);
+      background: white;
+    }
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.9rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-bottom: 0.75rem;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    .payment-option.selected { border-color: var(--earth); background: #fdf6ed; }
+    .payment-option input { accent-color: var(--earth); }
+
+    /* Steps */
+    .checkout-steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2rem;
+      background: white;
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .step {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .step.active { color: var(--earth); font-weight: 600; }
+    .step.done { color: var(--gold); }
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 2px solid var(--border);
+      color: var(--muted);
+    }
+    .step.active .step-num { border-color: var(--earth); background: var(--earth); color: white; }
+    .step.done .step-num { border-color: var(--gold); background: var(--gold); color: var(--dark); }
+    .step-arrow { color: var(--border); margin: 0 0.25rem; }
+
+    /* Order panel */
+    .order-panel {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 80px;
+    }
+    .order-panel h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--gold);
+    }
+    .order-line-item {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      align-items: center;
+    }
+    .order-line-item img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .order-line-name { font-size: 0.85rem; font-weight: 600; }
+    .order-line-meta { font-size: 0.78rem; color: var(--muted); }
+    .order-line-price { margin-left: auto; font-size: 0.9rem; font-weight: 700; }
+    .order-divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .order-total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+    .order-total-row.big { font-size: 1.05rem; font-weight: 700; color: var(--dark); }
+
+    /* Success */
+    .success-screen {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      grid-column: 1/-1;
+    }
+    .success-icon { font-size: 5rem; margin-bottom: 1rem; }
+
+    @media (max-width: 768px) {
+      .checkout-layout { grid-template-columns: 1fr; }
+      .order-panel { position: static; }
+      .form-row { grid-template-columns: 1fr; }
+      .checkout-steps { padding: 0.75rem 1rem; gap: 0; }
+      .step { font-size: 0.72rem; }
+      .step-num { width: 22px; height: 22px; font-size: 0.68rem; }
+      .checkout-form-panel { padding: 1.25rem; }
+      .payment-option { padding: 0.75rem; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+<header id="site-header"></header>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> › <a href="cart.html">Cart</a> › Checkout
+  </div>
+  <h1 class="section-title">Checkout</h1>
+
+  <!-- Steps -->
+  <div class="checkout-steps">
+    <div class="step done"><div class="step-num">✓</div> Cart</div>
+    <div class="step-arrow">›</div>
+    <div class="step active"><div class="step-num">2</div> Delivery</div>
+    <div class="step-arrow">›</div>
+    <div class="step"><div class="step-num">3</div> Payment</div>
+    <div class="step-arrow">›</div>
+    <div class="step"><div class="step-num">4</div> Confirm</div>
+  </div>
+
+  <div class="checkout-layout" id="checkout-layout">
+    <div class="loading" style="grid-column:1/-1;">Loading checkout…</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <p>© 2025 <span>AfriSteps</span> — Proudly made in Africa 🌍</p>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+  document.getElementById("site-header").innerHTML = renderNav();
+
+  const cart = getCart();
+
+  if (!cart.length) {
+    window.location = "shop.html";
+  }
+
+  // ── DELIVERY FEE LOGIC ──
+  // Montserrado: FREE delivery always
+  // Other counties: 20% of subtotal, free if 20+ items
+  const subtotal = cart.reduce((s, i) => s + parseFloat(i.price) * i.qty, 0);
+  const totalQty  = cart.reduce((s, i) => s + i.qty, 0);
+
+  function calcDelivery(county) {
+    if (county === "Montserrado") return 0;
+    if (totalQty >= 20) return 0;
+    return parseFloat((subtotal * 0.20).toFixed(2));
+  }
+
+  function calcTotal(county) {
+    return subtotal + calcDelivery(county);
+  }
+
+  // Render with initial county (Montserrado default)
+  function renderSummary(county) {
+    const delivery = calcDelivery(county);
+    const total    = calcTotal(county);
+    const isMontserrado = county === "Montserrado";
+    const freeReason = isMontserrado
+      ? "Free delivery in Montserrado"
+      : totalQty >= 20
+        ? "Free delivery (20+ items)"
+        : "";
+
+    document.getElementById("summary-delivery-row").innerHTML =
+      `<span>Delivery Fee</span><span>${delivery === 0
+        ? '<span style="color:#1a7d3e">FREE</span>'
+        : '$' + delivery.toFixed(2) + ' <span style="font-size:0.75rem;color:var(--muted)">(20% of subtotal)</span>'
+      }</span>`;
+
+    if (freeReason) {
+      document.getElementById("summary-free-hint").textContent = "✓ " + freeReason;
+      document.getElementById("summary-free-hint").style.display = "block";
+    } else {
+      document.getElementById("summary-free-hint").style.display = "none";
+    }
+
+    document.getElementById("summary-total-val").textContent = "$" + total.toFixed(2);
+    document.getElementById("place-order-btn").textContent = "🛡️ Place Order · $" + total.toFixed(2);
+  }
+
+  document.getElementById("checkout-layout").innerHTML = `
+    <!-- FORM -->
+    <div class="checkout-form-panel">
+      <div class="form-section">
+        <div class="form-section-title">📦 Delivery Information</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" id="fname" placeholder="John" required />
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" id="lname" placeholder="Doe" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" id="email" placeholder="john@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" id="phone" placeholder="+231 77 000 0000" required />
+        </div>
+        <div class="form-group">
+          <label>Delivery Point *</label>
+          <input type="text" id="address" placeholder="e.g. Sinkor, 12th Street, Blue Gate" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City / Town *</label>
+            <input type="text" id="city" placeholder="Monrovia" required />
+          </div>
+          <div class="form-group">
+            <label>County *</label>
+            <select id="county" onchange="renderSummary(this.value)">
+              <option value="Montserrado" selected>Montserrado</option>
+              <option value="Margibi">Margibi</option>
+              <option value="Bomi">Bomi</option>
+              <option value="Grand Bassa">Grand Bassa</option>
+              <option value="Grand Cape Mount">Grand Cape Mount</option>
+              <option value="Grand Gedeh">Grand Gedeh</option>
+              <option value="Grand Kru">Grand Kru</option>
+              <option value="Bong">Bong</option>
+              <option value="Lofa">Lofa</option>
+              <option value="Nimba">Nimba</option>
+              <option value="Maryland">Maryland</option>
+              <option value="Rivercess">Rivercess</option>
+              <option value="River Gee">River Gee</option>
+              <option value="Gbarpolu">Gbarpolu</option>
+              <option value="Sinoe">Sinoe</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">💳 Payment Method</div>
+
+        <label class="payment-option selected" onclick="selectPayment(this,'cod')">
+          <input type="radio" name="payment" value="cod" checked />
+          💵 Cash on Delivery
+          <span style="margin-left:auto;background:#e6f9ee;color:#1a7d3e;font-size:0.72rem;font-weight:700;padding:0.15rem 0.55rem;border-radius:20px;">Available</span>
+        </label>
+        <div class="payment-option" style="opacity:0.45;cursor:not-allowed;">
+          <input type="radio" name="payment" value="card" disabled />
+          💳 Credit / Debit Card
+          <span style="margin-left:auto;background:#f0ebe3;color:var(--muted);font-size:0.72rem;font-weight:700;padding:0.15rem 0.55rem;border-radius:20px;">Coming Soon</span>
+        </div>
+        <div class="payment-option" style="opacity:0.45;cursor:not-allowed;">
+          <input type="radio" name="payment" value="momo" disabled />
+          📱 Mobile Money (MTN / Orange)
+          <span style="margin-left:auto;background:#f0ebe3;color:var(--muted);font-size:0.72rem;font-weight:700;padding:0.15rem 0.55rem;border-radius:20px;">Coming Soon</span>
+        </div>
+        <div class="payment-option" style="opacity:0.45;cursor:not-allowed;">
+          <input type="radio" name="payment" value="paypal" disabled />
+          🅿️ PayPal
+          <span style="margin-left:auto;background:#f0ebe3;color:var(--muted);font-size:0.72rem;font-weight:700;padding:0.15rem 0.55rem;border-radius:20px;">Coming Soon</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="place-order-btn" style="width:100%;padding:1.1rem;font-size:1rem;" onclick="placeOrder()">
+        🛡️ Place Order · $${calcTotal("Montserrado").toFixed(2)}
+      </button>
+      <p style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:0.75rem;">
+        By placing your order you agree to our Terms of Service and Privacy Policy.
+      </p>
+    </div>
+
+    <!-- ORDER SUMMARY -->
+    <div class="order-panel">
+      <h2>Your Order</h2>
+      ${cart.map(item => `
+        <div class="order-line-item">
+          <img src="${item.image}" alt="${item.name}" />
+          <div>
+            <div class="order-line-name">${item.name}</div>
+            <div class="order-line-meta">Qty: ${item.qty}${item.selectedSize ? " · Size " + item.selectedSize : ""}</div>
+          </div>
+          <div class="order-line-price">$${(parseFloat(item.price) * item.qty).toFixed(2)}</div>
+        </div>`).join("")}
+      <hr class="order-divider" />
+      <div class="order-total-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+      <div class="order-total-row" id="summary-delivery-row">
+        <span>Delivery Fee</span><span><span style="color:#1a7d3e">FREE</span></span>
+      </div>
+      <div style="font-size:0.75rem;color:#1a7d3e;margin-bottom:0.4rem;text-align:right;" id="summary-free-hint">✓ Free delivery in Montserrado</div>
+      <hr class="order-divider" />
+      <div class="order-total-row big"><span>Total</span><span id="summary-total-val">$${calcTotal("Montserrado").toFixed(2)}</span></div>
+      <div style="margin-top:1rem;background:var(--cream);border-radius:10px;padding:0.75rem;font-size:0.8rem;color:var(--muted);">
+        <strong>📦 Estimated delivery:</strong> 1–3 business days
+      </div>
+    </div>`;
+
+  function selectPayment(el, type) {
+    document.querySelectorAll(".payment-option").forEach(o => o.classList.remove("selected"));
+    el.classList.add("selected");
+  }
+
+  function placeOrder() {
+    const fname  = document.getElementById("fname").value.trim();
+    const lname  = document.getElementById("lname").value.trim();
+    const email  = document.getElementById("email").value.trim();
+    const phone  = document.getElementById("phone").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const city   = document.getElementById("city").value.trim();
+    const county = document.getElementById("county").value;
+    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || "cod";
+
+    if (!fname || !email || !phone || !address || !city) {
+      showToast("⚠️ Please fill in all required fields.");
+      return;
+    }
+
+    const delivery = calcDelivery(county);
+    const total    = calcTotal(county);
+
+    const orderId = "ORD-" + Date.now().toString().slice(-6);
+    const order = {
+      id: orderId,
+      date: new Date().toISOString(),
+      status: "Pending",
+      customer: {
+        name: fname + " " + lname,
+        email: email,
+        phone: phone,
+        address: address,
+        city: city,
+        country: county + " County, Liberia"
+      },
+      payment: paymentMethod,
+      items: cart.map(function(i) {
+        return { id: i.id, name: i.name, image: i.image, price: i.price, qty: i.qty, size: i.selectedSize || "" };
+      }),
+      subtotal: subtotal.toFixed(2),
+      shipping: delivery.toFixed(2),
+      total: total.toFixed(2)
+    };
+
+    const orders = JSON.parse(localStorage.getItem("as_orders") || "[]");
+    orders.unshift(order);
+    localStorage.setItem("as_orders", JSON.stringify(orders));
+
+    saveOrderToSheet(order);
+
+    // ── WHATSAPP NOTIFICATION TO STORE OWNER ──
+    const waPhone = "231770000000"; // ← Change to your WhatsApp number (no + or spaces)
+    const itemsList = order.items.map(i => `${i.name} x${i.qty}${i.size?" (Sz:"+i.size+")":""}`).join(", ");
+    const waMsg = encodeURIComponent(
+      `🛒 *New AfriSteps Order!*\n\n` +
+      `*Order:* ${orderId}\n` +
+      `*Customer:* ${fname} ${lname}\n` +
+      `*Phone:* ${order.customer.phone}\n` +
+      `*County:* ${county}\n` +
+      `*Delivery Point:* ${order.customer.address}, ${order.customer.city}\n` +
+      `*Items:* ${itemsList}\n` +
+      `*Delivery Fee:* ${delivery===0?"FREE":"$"+delivery.toFixed(2)}\n` +
+      `*💵 Total COD:* $${total.toFixed(2)}\n` +
+      `*Payment:* Cash on Delivery`
+    );
+    // Open WhatsApp in new tab so customer stays on confirmation screen
+    setTimeout(() => window.open(`https://wa.me/${waPhone}?text=${waMsg}`, "_blank"), 800);
+
+    // ── BUILD DOWNLOADABLE RECEIPT ──
+    window.buildReceiptHTML = function buildReceiptHTML() {
+      const itemRows = order.items.map(i => {
+        const up = parseFloat(i.price||0), qty = parseInt(i.qty||1);
+        return `<tr>
+          <td style="padding:7px 10px;border-bottom:1px solid #eee">${i.name}${i.size?" (Size: "+i.size+")":""}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:center">${qty}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right">$${up.toFixed(2)}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right;font-weight:700">$${(up*qty).toFixed(2)}</td>
+        </tr>`;
+      }).join("");
+      return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AfriSteps Receipt - ${orderId}</title>
+<style>
+  body{font-family:Georgia,serif;max-width:520px;margin:30px auto;padding:24px;color:#1a1a1a;background:#fff}
+  .logo{font-size:1.7rem;font-weight:900;color:#8b5e2e}
+  .sub{font-size:0.78rem;color:#999;margin-top:2px}
+  .order-id{font-size:1.3rem;font-weight:900;color:#8b5e2e}
+  .badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;background:#fff3cd;color:#856404;font-family:sans-serif}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:0.88rem}
+  th{background:#fdf6ed;padding:8px 10px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:.05em;font-family:sans-serif}
+  th:nth-child(2){text-align:center} th:nth-child(3),th:nth-child(4){text-align:right}
+  .tl{display:flex;justify-content:space-between;padding:4px 0;font-size:0.88rem;font-family:sans-serif}
+  .gt{font-size:1.05rem;font-weight:900;color:#8b5e2e;border-top:2px solid #c9a84c;padding-top:8px;margin-top:4px}
+  .info-box{background:#fdf6ed;border-radius:8px;padding:12px 16px;margin:12px 0;font-family:sans-serif;font-size:0.85rem;line-height:1.8}
+  .keep-code{background:#fff8e1;border:2px dashed #c9a84c;border-radius:10px;padding:16px 20px;margin:18px 0;text-align:center;font-family:sans-serif}
+  .keep-code .label{font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:#856404;margin-bottom:6px;font-weight:700}
+  .keep-code .code{font-size:1.6rem;font-weight:900;color:#5a3c00;letter-spacing:3px;font-family:Georgia,serif}
+  .keep-code .msg{font-size:0.78rem;color:#7a5c00;margin-top:8px;line-height:1.6}
+  @media print{.no-print{display:none}}
+</style></head><body>
+<div style="text-align:center;border-bottom:2px solid #c9a84c;padding-bottom:16px;margin-bottom:20px">
+  <div class="logo">🌍 AfriSteps</div>
+  <div class="sub">African Footwear — Proudly Made in Africa</div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+  <div><div style="font-size:0.72rem;color:#888;font-family:sans-serif">ORDER RECEIPT</div><div class="order-id">${orderId}</div></div>
+  <div class="badge">Pending</div>
+</div>
+<div class="keep-code">
+  <div class="label">📋 Your Order Code — Keep This Safe!</div>
+  <div class="code">${orderId}</div>
+  <div class="msg">Show this code to our delivery agent when your order arrives.<br>You will need it to <strong>confirm and receive your delivery</strong>.</div>
+</div>
+<div class="info-box">
+  <strong>📅 Date:</strong> ${new Date(order.date).toLocaleString("en-GB")}<br>
+  <strong>💳 Payment:</strong> Cash on Delivery<br>
+  <strong>📍 Delivery Point:</strong> ${order.customer.address}, ${order.customer.city}, ${county} County, Liberia
+</div>
+<div class="info-box">
+  <strong>👤 Customer</strong><br>
+  ${fname} ${lname}<br>
+  📧 ${email}<br>
+  📞 ${order.customer.phone||"—"}
+</div>
+<table>
+  <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+  <tbody>${itemRows}</tbody>
+</table>
+<div style="text-align:right;font-family:sans-serif">
+  <div class="tl"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+  <div class="tl"><span>Delivery Fee</span><span>${delivery===0?'<span style="color:#1a7d3e;font-weight:700">FREE</span>':"$"+delivery.toFixed(2)}</span></div>
+  <div class="tl gt"><span>TOTAL</span><span>$${total.toFixed(2)}</span></div>
+</div>
+<div style="text-align:center;margin-top:24px;font-size:0.78rem;color:#888;border-top:1px solid #eee;padding-top:16px;font-family:sans-serif">
+  Thank you for shopping with AfriSteps! 🌍<br>Proudly supporting African craftsmanship.
+</div>
+<div class="no-print" style="text-align:center;margin-top:20px">
+  <button onclick="window.print()" style="padding:10px 24px;background:#8b5e2e;color:white;border:none;border-radius:8px;font-size:0.9rem;cursor:pointer;font-family:sans-serif">🖨️ Print Receipt</button>
+</div>
+</body></html>`;
+    };
+
+    window.downloadReceipt = function() {
+      const html = buildReceiptHTML();
+      const blob = new Blob([html], { type: "text/html" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "AfriSteps-Receipt-" + orderId + ".html";
+      a.click();
+    };
+
+    // ── SHOW SUCCESS SCREEN ──
+    document.getElementById("checkout-layout").innerHTML = `
+      <div class="success-screen" style="max-width:560px;margin:0 auto;">
+
+        <div class="success-icon">🎉</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:0.5rem;">Order Confirmed!</h2>
+        <p style="color:var(--muted);font-size:1rem;margin-bottom:1.5rem;">
+          Thank you, <strong>${fname}</strong>! Your order has been placed successfully.
+        </p>
+
+        <!-- ORDER CODE — keep safe -->
+        <div style="background:#fff8e1;border:2px dashed var(--gold);border-radius:14px;padding:1.25rem 1.5rem;margin:0 auto 1.5rem;max-width:420px;">
+          <div style="font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#856404;font-weight:700;margin-bottom:0.4rem;">📋 Your Order Code</div>
+          <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:#5a3c00;letter-spacing:3px;">${orderId}</div>
+          <div style="font-size:0.82rem;color:#7a5c00;margin-top:0.6rem;line-height:1.6;">
+            ⚠️ <strong>Keep this code safe!</strong> Show it to our delivery agent when your order arrives to <strong>confirm and receive your delivery</strong>.
+          </div>
+        </div>
+
+        <!-- Order details -->
+        <div style="background:white;border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;margin:0 auto 1.25rem;max-width:420px;text-align:left;">
+          <div style="font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:0.75rem;">Order Details</div>
+          <div style="display:flex;justify-content:space-between;font-size:0.86rem;margin-bottom:0.45rem;"><span style="color:var(--muted)">Email</span><span><strong>${email}</strong></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:0.86rem;margin-bottom:0.45rem;"><span style="color:var(--muted)">Phone</span><span><strong>${order.customer.phone}</strong></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:0.86rem;margin-bottom:0.45rem;"><span style="color:var(--muted)">County</span><span><strong>${county}</strong></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:0.86rem;margin-bottom:0.45rem;flex-wrap:wrap;gap:0.25rem;"><span style="color:var(--muted)">Delivery Point</span><span style="text-align:right"><strong>${order.customer.address}, ${order.customer.city}</strong></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:0.86rem;margin-bottom:0.3rem;"><span style="color:var(--muted)">Subtotal</span><span><strong>$${subtotal.toFixed(2)}</strong></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:0.86rem;margin-bottom:0.3rem;"><span style="color:var(--muted)">Delivery Fee</span><span style="color:#1a7d3e"><strong>${delivery===0?"FREE":"$"+delivery.toFixed(2)}</strong></span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:1rem;margin-top:0.6rem;padding-top:0.6rem;border-top:2px solid var(--gold);"><span style="font-weight:700">💵 Total Cash on Delivery</span><span style="font-weight:700;color:var(--earth);font-size:1.1rem;">$${total.toFixed(2)}</span></div>
+        </div>
+
+        <!-- Download prompt -->
+        <div style="background:#f0faf4;border:1px solid #a3d9b1;border-radius:10px;padding:0.9rem 1.2rem;margin:0 auto 1.5rem;max-width:420px;font-size:0.82rem;color:#2d6a4f;line-height:1.6;text-align:left;">
+          📥 <strong>Print or save your receipt</strong> and keep it on your phone.<br>
+          It contains your order code and all delivery details — you'll need it when our agent arrives.
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:0.75rem;">
+          <button onclick="downloadReceipt()" class="btn btn-primary" style="font-size:0.92rem;padding:0.85rem 1.5rem;">🖨️ Print Receipt</button>
+          <a href="shop.html" class="btn btn-dark">Continue Shopping</a>
+        </div>
+        <a href="index.html" style="font-size:0.82rem;color:var(--muted);text-decoration:underline;">Go to Home</a>
+
+      </div>`;
+
+    saveCart([]);
+    sessionStorage.removeItem("as_promo");
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2800);
+  }
+</script>
+</body>
+</html>
