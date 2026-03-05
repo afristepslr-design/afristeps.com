@@ -436,7 +436,7 @@
     saveOrderToSheet(order);
 
     // ── WHATSAPP NOTIFICATION TO STORE OWNER ──
-    const waPhone = "231770000000"; // ← Change to your WhatsApp number (no + or spaces)
+    const waPhone = "+231776028319"; // ← Change to your WhatsApp number (no + or spaces)
     const itemsList = order.items.map(i => `${i.name} x${i.qty}${i.size?" (Sz:"+i.size+")":""}`).join(", ");
     const waMsg = encodeURIComponent(
       `🛒 *New AfriSteps Order!*\n\n` +
