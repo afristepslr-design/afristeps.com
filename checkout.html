@@ -394,6 +394,16 @@
       return;
     }
 
+    // Warn if any cart item is missing a size
+    const missingSizes = cart.filter(i => {
+      const hasSizes = (i.size || "").split(",").map(s => s.trim()).filter(Boolean).length > 0;
+      return hasSizes && !i.selectedSize;
+    });
+    if (missingSizes.length > 0) {
+      showToast(`⚠️ Please select a size for: ${missingSizes.map(i => i.name).join(", ")}`);
+      return;
+    }
+
     const delivery = calcDelivery(county);
     const total    = calcTotal(county);
 
